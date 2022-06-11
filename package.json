@@ -1,0 +1,24 @@
+{
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.0",
+    "cookie-parser": "^1.4.6",
+    "express": "^4.17.3",
+    "jsonwebtoken": "^8.5.1",
+    "mongoose": "^6.3.1"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines":{
+    "node":"16.11.0"
+  },
+  "name": "back-master",
+  "version": "1.0.0",
+  "main": "db.js",
+  "devDependencies": {},
+  "author": "",
+  "license": "ISC",
+  "description": ""
+  
+}
