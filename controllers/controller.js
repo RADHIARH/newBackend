@@ -56,14 +56,13 @@ const login = async (req, res) => {
   }
 };
 
-const getusers = async (req, res,next) => {
- try {
-   const data = await users.find();
-   res.header({ "Access-Control-Allow-Origin": "*" });
-   res.send(data);
- } catch (err) {
-   console.log(err);
- }
+const getusers = async (req, res, next) => {
+  try {
+    const data = await users.find();
+    res.send(data);
+  } catch (err) {
+    console.log(err);
+  }
 };
 const getconnecteduser = async (req, res) => {
   const id = req.userid;
@@ -98,6 +97,7 @@ const addmessage = async (req, res) => {
       id_receiver: id_receiver,
       vue: false,
     });
+    res.send(data)
     await data.save();
   } catch (err) {
     res.send(err);
