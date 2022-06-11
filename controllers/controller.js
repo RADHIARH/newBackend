@@ -65,7 +65,7 @@ const getusers = async (req, res, next) => {
   }
 };
 const getconnecteduser = async (req, res) => {
-  const id = req.userid;
+  const id = req.body.userid;
   try {
     const user = await users.findById(id);
     res.send(user);
@@ -74,13 +74,19 @@ const getconnecteduser = async (req, res) => {
   }
 };
 const getusermessages = async (req, res) => {
-  const messages = await users_messages.find();
-  res.send(messages);
+  try {
+    const messages = await users_messages.find();
+    res.send(messages);
+  } catch (err) {
+    console.log(err);
+  }
 };
 const deletemessage = async (req, res) => {
   try {
     const { idd } = req.params;
-    res.send(await users_messages.findByIdAndDelete(idd));
+    const data = await users_messages.findByIdAndDelete(idd);
+    res.send(data._id);
+    console.log(data._id);
   } catch (err) {
     res.send(err);
   }
@@ -88,7 +94,7 @@ const deletemessage = async (req, res) => {
 
 const addmessage = async (req, res) => {
   const message = req.body.message;
-  const id_sender = req.body.iduser;
+  const id_sender = req.body.iduse;
   const id_receiver = req.body.id_receiver;
   try {
     const data = new users_messages({
@@ -97,7 +103,8 @@ const addmessage = async (req, res) => {
       id_receiver: id_receiver,
       vue: false,
     });
-    res.send(data)
+    res.send(data);
+    console.log(data);
     await data.save();
   } catch (err) {
     res.send(err);
@@ -130,19 +137,23 @@ const register = async (req, res) => {
 // Groups
 const addgroup = async (req, res) => {
   const groupname = req.body.groupname;
-  const data = await new groups({
-    name: groupname,
-    img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/LetterG.svg/800px-LetterG.svg.png",
-    members: [],
-    messages: [],
-  });
-  await data.save();
+  try {
+    const data = await new groups({
+      name: groupname,
+      img: "https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/LetterG.svg/800px-LetterG.svg.png",
+      members: [],
+      messages: [],
+    });
+    res.send(data);
+    await data.save();
+  } catch (err) {
+    console.log(err);
+  }
 };
 const getgroups = async (req, res) => {
   try {
-    const listgroups = await groups.find();
-    res.send(listgroups);
-    // console.log(listgroups);
+    const data = await groups.find();
+    res.send(data);
   } catch (err) {
     console.log(err);
   }
@@ -156,15 +167,20 @@ const getmsggroup = async (req, res) => {
   }
 };
 const joingroup = async (req, res) => {
-  const iduser = req.body.iduser;
+  const iduser = req.body.iduse;
   const idgroup = req.body.idgroup;
+  console.log(iduser);
+  console.log(idgroup);
   try {
-    const newgroups = await groups.findByIdAndUpdate(idgroup, {
-      $push: {
-        members: { iduser: iduser },
+    const newgroups = await groups.findByIdAndUpdate(
+      idgroup,
+      {
+        $push: {
+          members: { iduser: iduser },
+        },
       },
-    });
-    console.log("added to group" + idgroup);
+      { new: true }
+    );
     res.send(newgroups);
   } catch (err) {
     res.send(err);
@@ -180,8 +196,9 @@ const addmessagetogroup = async (req, res) => {
       id_sender: iduse,
       id_group: idgroup,
     });
+    res.send(data);
+    console.log(data);
     await data.save();
-    console.log("message added");
   } catch (err) {
     console.log(err);
   }
@@ -214,15 +231,16 @@ const editpassword = async (req, res) => {
       const newusers = await users.findByIdAndUpdate(req.body.userid, {
         password: bcrypt.hashSync(req.body.password, 10),
       });
-      res.send(newusers);
-      console.log(newusers);
+      res.send({ res: newusers });
+    } else {
+      res.send({ message: "error" });
     }
   } catch (err) {
     console.log(err);
   }
 };
 const addfriend = async (req, res) => {
-  const iduser = req.body.iduser;
+  const iduser = req.body.iduse;
   const idfriend = req.body.idfriend;
   try {
     const newusers = await users.findByIdAndUpdate(idfriend, {
@@ -237,10 +255,12 @@ const addfriend = async (req, res) => {
   }
 };
 const acceptinvit = async (req, res) => {
-  const userid = req.body.id_user;
+  const userid = req.body.iduse;
   const idfriend = req.body.idfriend;
+  console.log("friend1" + userid);
+  console.log("friend2" + idfriend);
   try {
-    await users.findByIdAndUpdate(
+    const users1 = await users.findByIdAndUpdate(
       userid,
       {
         $set: {
@@ -253,8 +273,20 @@ const acceptinvit = async (req, res) => {
         },
       }
     );
+    const users2 = await users.findByIdAndUpdate(userid, {
+      $push: {
+        friendsList: { idfriend: idfriend },
+      },
+    });
 
-    console.log("accepted");
+    const users3 = await users.findByIdAndUpdate(idfriend, {
+      $push: {
+        friendsList: { idfriend: userid },
+      },
+    });
+
+    console.log("accepted1");
+    res.send(users3);
   } catch (err) {
     console.log(err);
   }
@@ -262,8 +294,9 @@ const acceptinvit = async (req, res) => {
 };
 
 const acceptinvit2 = async (req, res) => {
-  const userid = req.body.id_user;
+  const userid = req.body.iduse;
   const idfriend = req.body.idfriend;
+
   try {
     await users.findByIdAndUpdate(idfriend, {
       $push: {
@@ -271,56 +304,80 @@ const acceptinvit2 = async (req, res) => {
       },
     });
 
-    console.log("accepted");
+    console.log("accepted2");
   } catch (err) {
     console.log(err);
   }
-  //   const newusers = users.bulkWrite(
-  //     [
-  //       {
-  //         updateOne: {
-  //           filter: { _id: userid },
-  //           update: {
-  //             $set: { invitations: { idfriend: idfriend, accepted: true } },
-  //             $push: { friendsList: { idfriend: idfriend } },
-  //           },
-  //         },
-  //       },
-  //       {
-  //         updateOne: {
-  //           filter: { _id: idfriend },
-  //           update: {
-  //             $set: { invitations: { idfriend: userid } },
-  //           },
-  //         },
-  //       },
-  //     ],
-  //     {
-  //       ordered: true,
-  //     }
-  //   );
-  //   console.log("friends added ");
-  //   res.send(newusers);
-  // } catch (err) {
-  //   console.log(err);
-  // }
 };
 const removefriend = async (req, res) => {
   const iduser = req.body.iduser;
   const idfriend = req.body.idfriend;
+  console.log("userrr" + iduser);
+  console.log("idfriend2" + idfriend);
   try {
     const newusers = await users.findByIdAndUpdate(iduser, {
       $pull: {
         friendsList: { idfriend: idfriend },
       },
     });
+    const newuser2 = await users.findByIdAndUpdate(idfriend, {
+      $pull: {
+        friendsList: { idfriend: iduser },
+      },
+    });
     res.send(newusers);
+    console.log(newusers);
     console.log("deleted");
   } catch (err) {
     console.log(err);
   }
 };
-
+const setmessagetoviewed = async (req, res) => {
+  const iduser = req.body.iduse;
+  const iduser2 = req.body.idus;
+  console.log("user1" + iduser);
+  console.log("user2" + iduser2);
+  try {
+    const newmessages = await users_messages.updateMany(
+      {
+        id_receiver: iduser,
+        id_sender: iduser2,
+      },
+      { $set: { vue: true } }
+    );
+    res.send(newmessages);
+    console.log(newmessages);
+  } catch (err) {
+    console.log(err);
+  }
+};
+const editPicture = async (req, res) => {
+  const userid = req.body.iduse;
+  const url = req.body.url;
+  console.log("urll" + url);
+  try {
+    const newusers = await users.findByIdAndUpdate(userid, {
+      img: url,
+    });
+    res.send(newusers);
+  } catch (err) {
+    console.log;
+  }
+};
+const leavegroup = async (req, res) => {
+  const groupid = req.body.idgroup;
+  const userid = req.body.iduse;
+  const newgroups = await groups.findByIdAndUpdate(
+    groupid,
+    {
+      $pull: { members: { iduser: userid } },
+    },
+    { new: true }
+  );
+  res.send(newgroups);
+  console.log("leaved");
+  console.log(newgroups);
+};
 module.exports.getusers = getusers;
 module.exports.getusermessages = getusermessages;
 module.exports.deletemessage = deletemessage;
@@ -339,3 +396,6 @@ module.exports.addfriend = addfriend;
 module.exports.acceptinvit = acceptinvit;
 module.exports.removefriend = removefriend;
 module.exports.acceptinvit2 = acceptinvit2;
+module.exports.setmessagetoviewed = setmessagetoviewed;
+module.exports.editPicture = editPicture;
+module.exports.leavegroup = leavegroup;
