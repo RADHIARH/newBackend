@@ -28,6 +28,8 @@ const addfriend = require("./routes/addfriend");
 const acceptinvit = require("./routes/acceptinvitation");
 const removefriend = require("./routes/deletefriend");
 const acceptinvit2 = require("./routes/acceptinvit2");
+const cors = require("cors");
+app.use(cors());
 app.use("/list", group);
 app.use("/users", users);
 app.use("/messages", user_messages);
