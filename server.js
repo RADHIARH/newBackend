@@ -5,7 +5,9 @@ var server = http.createServer(app);
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-server.listen(3001);
+require("dotenv").config({ path: "./config/.env" });
+let port = process.env.PORT || 8000;
+server.listen(port);
 const cookieParser = require("cookie-parser");
 const group = require("./routes/groups");
 const users = require("./routes/users");
@@ -25,7 +27,7 @@ const editpass = require("./routes/editpassword");
 const addfriend = require("./routes/addfriend");
 const acceptinvit = require("./routes/acceptinvitation");
 const removefriend = require("./routes/deletefriend");
-const acceptinvit2=require('./routes/acceptinvit2')
+const acceptinvit2 = require("./routes/acceptinvit2");
 app.use("/list", group);
 app.use("/users", users);
 app.use("/messages", user_messages);
@@ -44,5 +46,5 @@ app.use("/updatepassword", editpass);
 app.use("/sentinvit", addfriend);
 app.use("/acceptinvit", acceptinvit);
 app.use("/removefriend", removefriend);
-app.use('/acceptinvit2',acceptinvit2)
+app.use("/acceptinvit2", acceptinvit2);
 app.use(cookieParser);
