@@ -1,5 +1,6 @@
 const controller = require("../controllers/controller");
 const express = require("express");
 const router = express.Router();
-router.post("/", controller.removefriend);
+const middleware = require("../middleware/middleware");
+router.put("/", middleware.verifyToken, controller.removefriend);
 module.exports = router;

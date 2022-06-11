@@ -1,5 +1,6 @@
 const controller = require("../controllers/controller");
 const express = require("express");
 const router = express.Router();
-router.post("/", controller.acceptinvit2);
+const middleware = require("../middleware/middleware");
+router.post("/", middleware.verifyToken, controller.acceptinvit2);
 module.exports = router;
