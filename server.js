@@ -52,5 +52,4 @@ app.use("/acceptinvit", acceptinvit);
 app.use("/removefriend", removefriend);
 app.use("/acceptinvit2", acceptinvit2);
 app.use("/setviewed", setmessagetoread);
-app.use("/leavegroup", leavegrp);
 app.use(cookieParser);
