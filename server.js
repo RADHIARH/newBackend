@@ -29,7 +29,6 @@ const acceptinvit = require("./routes/acceptinvitation");
 const removefriend = require("./routes/deletefriend");
 const acceptinvit2 = require("./routes/acceptinvit2");
 const setmessagetoread = require("./routes/setmessageviewed");
-const leavegrp = requie("./routes/leavegrp.js");
 const cors = require("cors");
 app.use(cors());
 app.use("/list", group);
