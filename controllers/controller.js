@@ -335,8 +335,6 @@ const removefriend = async (req, res) => {
 const setmessagetoviewed = async (req, res) => {
   const iduser = req.body.iduse;
   const iduser2 = req.body.idus;
-  console.log("user1" + iduser);
-  console.log("user2" + iduser2);
   try {
     const newmessages = await users_messages.updateMany(
       {
@@ -346,7 +344,7 @@ const setmessagetoviewed = async (req, res) => {
       { $set: { vue: true } }
     );
     res.send(newmessages);
-    console.log(newmessages);
+    console.log("updated" + newmessages);
   } catch (err) {
     console.log(err);
   }
